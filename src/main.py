@@ -43,10 +43,13 @@ async def add_ssid(ssid: SSID):
         return {"message": "Success to add ssid"}
 
 
-@app.get("/is_exist_ssid")
-async def is_exist_ssid(ssid: str):
-    res = ssid_repository.is_exist_ssid(ssid)
-    return {"is_exist": res}
+@app.post("/ssid_and_password")
+async def get_ssid_and_password(ssid: list[str]):
+    res = ssid_repository.get_ssid_and_password(ssid)
+    if not res:
+        raise HTTPException(status_code=404, detail="Failed to get ssid and password")
+    else:
+        return {"ssid": res[0], "password": res[1]}
 
 @app.get("/reset_db")
 async def reset_db():

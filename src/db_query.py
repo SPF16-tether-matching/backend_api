@@ -92,14 +92,17 @@ class SSIDRepository:
             logger.error(e)
             return False
     
-    def is_exist_ssid(self, ssid: str) -> bool:
+    def get_ssid_and_password(self, ssids: list[str]) -> Optional[tuple[str, str]]:
         try:
             conn = sqlite3.connect(db_path)
             cur = conn.cursor()
-            cur.execute("SELECT * FROM ssids WHERE ssid=?", (ssid,))
-            result = cur.fetchone()
+            for ssid in ssids:
+                cur.execute("SELECT password FROM ssids WHERE ssid=?", (ssid,))
+                result = cur.fetchone()
+                if result is not None:
+                    return (ssid, result[0])
             conn.close()
-            return result is not None
+            return None
         except Exception as e:
             logger.error(e)
             return False
