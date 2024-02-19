@@ -84,7 +84,12 @@ class SSIDRepository:
         try:
             conn = sqlite3.connect(db_path)
             cur = conn.cursor()
-            cur.execute("INSERT INTO ssids VALUES (?, ?, ?)", (ssid.user_id, ssid.ssid, ssid.password))
+            cur.execute("SELECT * from ssids WHERE user_id = ? AND ssid = ?", (ssid.user_id, ssid.ssid))
+            res = cur.fetchone()
+            if res is not None:
+                cur.execute("UPDATE ssids SET password = ? WHERE user_id = ? AND ssid = ?", (ssid.password, ssid.user_id, ssid.ssid))
+            else:
+                cur.execute("INSERT INTO ssids VALUES (?, ?, ?)", (ssid.user_id, ssid.ssid, ssid.password))
             conn.commit()
             conn.close()
             return True
